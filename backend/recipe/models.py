@@ -11,6 +11,12 @@ class Tag(models.Model):
     slug = models.SlugField(max_length=50, blank=False, unique=True)
 
 
+class Ingredient(models.Model):
+    name = models.CharField(max_length=50, blank=False)
+    amount = models.IntegerField(max_length=10, blank=False, null=False)
+    measure = models.CharField(max_length=10, blank=False)
+
+
 class Recipe(models.Model):
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
