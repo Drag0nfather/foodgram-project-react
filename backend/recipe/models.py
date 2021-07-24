@@ -17,7 +17,10 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(max_length=50, blank=False)
     amount = models.IntegerField(blank=False, null=False)
-    measure = models.CharField(max_length=10, blank=False)
+    measurement_unit = models.CharField(max_length=10, blank=False)
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(models.Model):
