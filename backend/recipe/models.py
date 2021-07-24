@@ -15,8 +15,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=50, blank=False)
-    amount = models.IntegerField(blank=False, null=False)
+    name = models.CharField(max_length=50, blank=False, unique=True)
     measurement_unit = models.CharField(max_length=10, blank=False)
 
     def __str__(self):
@@ -34,3 +33,12 @@ class Recipe(models.Model):
     ingredient = models.ManyToManyField(Ingredient, blank=False)
     tag = models.ManyToManyField(Tag, blank=False)
     cooking_time = models.IntegerField(blank=False, null=False)
+
+
+class IngredientInRecipe(models.Model):
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    amount = models.IntegerField(blank=False, null=False)
+
+    def __str__(self):
+        return self.ingredient.name
