@@ -34,6 +34,9 @@ class Recipe(models.Model):
     tag = models.ManyToManyField(Tag, blank=False)
     cooking_time = models.IntegerField(blank=False, null=False)
 
+    def __str__(self):
+        return self.name
+
 
 class IngredientInRecipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
@@ -41,4 +44,4 @@ class IngredientInRecipe(models.Model):
     amount = models.IntegerField(blank=False, null=False)
 
     def __str__(self):
-        return self.ingredient.name
+        return self.ingredient
