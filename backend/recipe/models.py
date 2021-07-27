@@ -30,7 +30,7 @@ class Recipe(models.Model):
     name = models.CharField(max_length=50, blank=False)
     image = models.ImageField(upload_to='static/', blank=False, null=False)
     text = models.TextField(max_length=1000, blank=False)
-    ingredient = models.ManyToManyField(Ingredient, blank=False)
+    ingredient = models.ManyToManyField(Ingredient, through='IngredientInRecipe', blank=False)
     tag = models.ManyToManyField(Tag, blank=False)
     cooking_time = models.IntegerField(blank=False, null=False)
 
