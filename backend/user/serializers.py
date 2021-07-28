@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     """
-    Serializer for password change endpoint.
+    Serializer for password change.
     """
     model = User
     new_password = serializers.CharField(required=True)
