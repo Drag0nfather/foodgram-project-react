@@ -91,12 +91,19 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeReadSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     ingredients = IngredientInRecipeSerializer(read_only=True, many=True)
+    is_favorited = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'author', 'name', 'text', 'image',
+        fields = ('id', 'author', 'is_favorited', 'name', 'text', 'image',
                   'ingredients', 'tags', 'cooking_time')
+
+    def get_is_favorited(self, obj):
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            return False
+        return obj.is_favorited.filter(user=user).exists()
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
