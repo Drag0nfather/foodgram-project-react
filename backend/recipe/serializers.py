@@ -172,3 +172,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             context={'request': self.context.get('request')}
         ).data
         return data  # noqa R504
+
+
+class FavouriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
