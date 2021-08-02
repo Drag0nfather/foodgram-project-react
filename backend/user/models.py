@@ -18,12 +18,20 @@ class Follow(models.Model):
 
 
 class FavouriteRecipe(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name='is_favorited')
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name='is_favorited')
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'recipe'],
                                                name='user_favourite')]
+
+    def __str__(self):
+        return f'{self.recipe.name} в избранном у пользователя ' \
+               f'{self.user.username}'
 
 
 class ShoppingCart(models.Model):
