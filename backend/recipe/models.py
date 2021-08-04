@@ -30,7 +30,7 @@ class Recipe(models.Model):
     name = models.CharField(max_length=50, blank=False)
     image = models.ImageField(upload_to='static/', blank=False, null=False)
     text = models.TextField(max_length=1000, blank=False)
-    ingredients = models.ManyToManyField(Ingredient, through='IngredientInRecipe', blank=False)
+    ingredients = models.ManyToManyField(Ingredient, through='IngredientInRecipe', related_name='recipes', blank=False)
     tags = models.ManyToManyField(Tag, blank=False)
     cooking_time = models.IntegerField(blank=False, null=False)
 
@@ -39,9 +39,14 @@ class Recipe(models.Model):
 
 
 class IngredientInRecipe(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='amounts')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='amounts')
     amount = models.IntegerField(blank=False, null=False)
 
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['recipe', 'ingredient'],
+            name='recipe_ingredient_unique')]
+
     def __str__(self):
-        return self.ingredient
+        return f'Количество "{self.ingredient}" в рецепте "{self.recipe}"'
