@@ -7,6 +7,7 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
+from user.serializers import UserSerializer
 from .models import Tag, Recipe, Ingredient, IngredientInRecipe, User
 
 
@@ -32,12 +33,6 @@ class Base64ImageField(serializers.ImageField):
             extension = 'jpg'
         return extension  # noqa R504
 
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('email', 'id', 'username', 'first_name', 'last_name')
-        model = User
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -74,23 +69,13 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientInRecipe
-        fields = ('id', 'name', 'amount', 'measurement_unit')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
         read_only_fields = ('amount',)
-
-
-class RecipeSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(read_only=True, many=True)
-    author = UserSerializer(read_only=True)
-    ingredients = IngredientInRecipeSerializer(read_only=True, many=True)
-
-    class Meta:
-        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time')
-        model = Recipe
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    ingredients = IngredientInRecipeSerializer(read_only=True, many=True)
+    ingredients = IngredientInRecipeSerializer(source='amounts', many=True)
     is_favorited = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, read_only=True)
 
@@ -135,9 +120,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             amount = ingredient['amount']
             id = ingredient['id']
             IngredientInRecipe.objects.create(
-                ingredient=get_object_or_404(IngredientInRecipe, id=id),
-                recipe=recipe, amount=amount
-            )
+                ingredient=get_object_or_404(Ingredient, id=id),
+                recipe=recipe, amount=amount)
         for tag in tags_data:
             recipe.tags.add(tag)
         return recipe
