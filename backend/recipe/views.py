@@ -9,8 +9,8 @@ from recipe.filters import RecipeFilter
 from recipe.models import Tag, Recipe, Ingredient
 from recipe.permissions import AuthPostRetrieve, IsAuthorOrReadOnly
 from recipe.serializers import TagSerializer, IngredientReadSerializer, RecipeReadSerializer, RecipeWriteSerializer, \
-    FavouriteSerializer
-from user.models import FavouriteRecipe
+    FavouriteSerializer, ShoppingCartSerializer
+from user.models import FavouriteRecipe, ShoppingCart
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -63,5 +63,26 @@ class RecipeViewSet(mixins.ListModelMixin,
             data = {'errors': 'Этого рецепта не было в вашем избранном'}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         FavouriteRecipe.objects.filter(user=user, recipe=recipe).delete()
+        data = {'deleted': 'success'}
+        return Response(data=data, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['get', 'delete'],
+            permission_classes=[IsAuthenticated])
+    def shopping_cart(self, request, pk):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        user = request.user
+        if request.method == 'GET':
+            if not user.is_in_shopping_cart.filter(recipe=recipe).exists():
+                ShoppingCart.objects.create(user=user, recipe=recipe)
+                serializer = ShoppingCartSerializer(
+                    recipe, context={'request': request})
+                return Response(data=serializer.data,
+                                status=status.HTTP_201_CREATED)
+            data = {'errors': 'Этот рецепт уже есть в списке покупок'}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        if not user.is_in_shopping_cart.filter(recipe=recipe).exists():
+            data = {'errors': 'Этого рецепта не было в вашем списке покупок'}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
         data = {'deleted': 'success'}
         return Response(data=data, status=status.HTTP_204_NO_CONTENT)
