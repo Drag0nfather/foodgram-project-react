@@ -3,7 +3,7 @@ from http import HTTPStatus
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from user.models import User, Follow
@@ -26,7 +26,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'],
             serializer_class=ChangePasswordSerializer,
-            detail=False, permission_classes=[IsAuthenticated])
+            detail=False, permission_classes=[IsAuthenticated, IsAdminUser])
     def set_password(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         if serializer.is_valid():
