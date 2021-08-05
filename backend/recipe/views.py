@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -6,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from recipe.filters import RecipeFilter
-from recipe.models import Tag, Recipe, Ingredient
+from recipe.models import Tag, Recipe, Ingredient, IngredientInRecipe
 from recipe.permissions import AuthPostRetrieve, IsAuthorOrReadOnly
 from recipe.serializers import TagSerializer, IngredientReadSerializer, RecipeReadSerializer, RecipeWriteSerializer, \
     FavouriteSerializer, ShoppingCartSerializer
@@ -86,3 +87,35 @@ class RecipeViewSet(mixins.ListModelMixin,
         ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
         data = {'deleted': 'success'}
         return Response(data=data, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
+    def download_shopping_cart(self, request):
+        user = request.user
+        shopping_list = user.is_in_shopping_cart.all()
+        shopping_dict = {}
+        for record in shopping_list:
+            recipe = record.recipe
+            ingredients = IngredientInRecipe.objects.filter(recipe=recipe)
+            for ingredient in ingredients:
+                amount = ingredient.amount
+                name = ingredient.ingredient.name
+                measurement_unit = ingredient.ingredient.measurement_unit
+                if name not in shopping_dict:
+                    shopping_dict[name] = {
+                        'measurement_unit': measurement_unit,
+                        'amount': amount}
+                else:
+                    shopping_dict[name]['amount'] = (
+                            shopping_dict[name]['amount'] + amount)
+        shoppinglist = []
+        shoppinglist.append('Список покупок:\n\n')
+        for item in shopping_dict:
+            shoppinglist.append(
+                f'{item} ({shopping_dict[item]["measurement_unit"]}) - '
+                f'{shopping_dict[item]["amount"]} \n')
+        shoppinglist.append('\n')
+        shoppinglist.append('Продуктовый помощник Foodgram ©')
+        response = HttpResponse(shoppinglist, 'Content-Type: text/plain')
+        response['Content-Disposition'] = 'attachment; filename="wishlist.txt"'
+        return response
