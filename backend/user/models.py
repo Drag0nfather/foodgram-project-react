@@ -16,6 +16,9 @@ class Follow(models.Model):
                                on_delete=models.CASCADE,
                                related_name='following')
 
+    def __str__(self):
+        return f'Пользователь "{self.user}" подписан на пользователя "{self.author}"'
+
 
 class FavouriteRecipe(models.Model):
     user = models.ForeignKey(User,
@@ -43,3 +46,6 @@ class ShoppingCart(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'recipe'],
                                                name='user_purchases')]
+
+    def __str__(self):
+        return f'"{self.recipe}" в списке покупок у "{self.user}"'
