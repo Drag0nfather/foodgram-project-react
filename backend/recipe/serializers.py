@@ -34,7 +34,6 @@ class Base64ImageField(serializers.ImageField):
         return extension  # noqa R504
 
 
-
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
