@@ -9,6 +9,8 @@ class Follow(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'author'],
                                                name='unique follow')]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              related_name='follower')
@@ -31,6 +33,8 @@ class FavouriteRecipe(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'recipe'],
                                                name='user_favourite')]
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
 
     def __str__(self):
         return f'{self.recipe.name} в избранном у пользователя ' \
@@ -46,6 +50,8 @@ class ShoppingCart(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'recipe'],
                                                name='user_purchases')]
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
 
     def __str__(self):
         return f'"{self.recipe}" в списке покупок у "{self.user}"'

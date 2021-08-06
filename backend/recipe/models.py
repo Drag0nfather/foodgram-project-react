@@ -6,6 +6,9 @@ User = get_user_model()
 
 
 class Tag(models.Model):
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
     name = models.CharField(max_length=50, blank=False, unique=True,)
     color = models.CharField(max_length=50, blank=False, unique=True)
     slug = models.SlugField(max_length=50, blank=False, unique=True)
@@ -15,6 +18,9 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
     name = models.CharField(max_length=50, blank=False, unique=True)
     measurement_unit = models.CharField(max_length=10, blank=False)
 
@@ -23,6 +29,9 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
                                blank=False,
@@ -47,6 +56,8 @@ class IngredientInRecipe(models.Model):
         constraints = [models.UniqueConstraint(
             fields=['recipe', 'ingredient'],
             name='recipe_ingredient_unique')]
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
 
     def __str__(self):
         return f'Количество "{self.ingredient}" в рецепте "{self.recipe}"'
