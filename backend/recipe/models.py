@@ -21,7 +21,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-    name = models.CharField(max_length=50, blank=False, unique=True)
+    name = models.CharField(max_length=60, blank=False, unique=True)
     measurement_unit = models.CharField(max_length=10, blank=False)
 
     def __str__(self):
