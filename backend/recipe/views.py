@@ -65,8 +65,7 @@ class RecipeViewSet(mixins.ListModelMixin,
             data = {'errors': 'Этого рецепта не было в вашем избранном'}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         FavouriteRecipe.objects.filter(user=user, recipe=recipe).delete()
-        data = {'deleted': 'success'}
-        return Response(data=data, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['get', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -86,8 +85,7 @@ class RecipeViewSet(mixins.ListModelMixin,
             data = {'errors': 'Этого рецепта не было в вашем списке покупок'}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
-        data = {'deleted': 'success'}
-        return Response(data=data, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -109,7 +107,7 @@ class RecipeViewSet(mixins.ListModelMixin,
                 else:
                     shopping_dict[name]['amount'] = (
                             shopping_dict[name]['amount'] + amount)
-        shoppinglist = []
+        shoppinglist = list()
         shoppinglist.append('Список покупок:\n\n')
         for item in shopping_dict:
             shoppinglist.append(
