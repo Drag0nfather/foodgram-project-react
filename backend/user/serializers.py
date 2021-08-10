@@ -22,11 +22,29 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
-    def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if not user.is_authenticated:
+    @staticmethod
+    def get_is_subscribed(obj):
+        if not obj.is_authenticated:
             return False
-        return obj.following.filter(user=user).exists()
+        return obj.following.filter(user__in=User.objects.all()).exists()
+
+
+class UserOutputSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+
+class UserInputSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, required=True, allow_blank=False)
+    password = serializers.CharField(required=True, allow_blank=False)
+    first_name = serializers.CharField(max_length=150, required=True, allow_blank=False)
+    last_name = serializers.CharField(max_length=150, required=True, allow_blank=False)
+    email = serializers.EmailField()
+
+
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
